@@ -1,7 +1,6 @@
 # 🚀 NeuroChat - Modern Real-Time Chat Application
 
 <div align="center">
-  <img src="https://via.placeholder.com/200x200/4F46E5/FFFFFF?text=NeuroChat" alt="NeuroChat Logo" width="200" height="200" style="border-radius: 20px;">
   
   **A beautiful, modern, and feature-rich real-time chat application built with React and Node.js**
   
@@ -87,8 +86,7 @@
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/neurochat.git
-   cd neurochat
+   git clone https://github.com/Rupayan2005/NeuroChat.git
    ```
 
 2. **Install backend dependencies**
