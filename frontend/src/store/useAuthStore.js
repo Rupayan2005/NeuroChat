@@ -46,6 +46,12 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
+
+      // Store token in localStorage
+      if (res.data.token) {
+        localStorage.setItem("auth-token", res.data.token);
+      }
+
       set({ authUser: res.data });
       toast.success("Account created successfully");
       get().connectSocket();
@@ -61,6 +67,12 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
+
+      // Store token in localStorage
+      if (res.data.token) {
+        localStorage.setItem("auth-token", res.data.token);
+      }
+
       set({ authUser: res.data });
       toast.success("Logged in successfully");
       get().connectSocket();
@@ -78,9 +90,23 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
+
+      // Clear token from localStorage
+      localStorage.removeItem("auth-token");
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Force a page reload to ensure complete state reset
+      window.location.href = "/login";
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error(error.response.data.message);
+      // Even if logout request fails, clear local state
+      set({ authUser: null });
+      get().disconnectSocket();
+      localStorage.removeItem("auth-token");
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "/login";
     }
   },
 
