@@ -103,8 +103,8 @@ export const useAuthStore = create((set, get) => ({
       localStorage.clear();
       sessionStorage.clear();
 
-      // Force a page reload to ensure complete state reset
-      window.location.href = "/login";
+      // Redirect to welcome page instead of login page
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout error:", error);
       // Even if logout request fails, clear local state
@@ -113,7 +113,7 @@ export const useAuthStore = create((set, get) => ({
       localStorage.removeItem("auth-token");
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   },
 

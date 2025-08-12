@@ -42,9 +42,13 @@ axiosInstance.interceptors.response.use(
       localStorage.clear();
       sessionStorage.clear();
 
-      // Redirect to login page
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
+      // Redirect to welcome page instead of login page
+      if (
+        window.location.pathname !== "/" &&
+        window.location.pathname !== "/login" &&
+        window.location.pathname !== "/signup"
+      ) {
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);
