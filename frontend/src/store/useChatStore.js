@@ -17,7 +17,16 @@ export const useChatStore = create((set, get) => ({
       set({ users: res.data });
     } catch (error) {
       console.error("Error fetching users:", error);
-      toast.error(error.response.data.message);
+
+      // Handle 401 errors specifically
+      if (error.response?.status === 401) {
+        console.log("Unauthorized access - clearing auth state");
+        useAuthStore.getState().logout();
+        toast.error("Session expired. Please login again.");
+        return;
+      }
+
+      toast.error(error.response?.data?.message || "Failed to fetch users");
     } finally {
       set({ isUsersLoading: false });
     }
@@ -30,7 +39,16 @@ export const useChatStore = create((set, get) => ({
       set({ messages: res.data });
     } catch (error) {
       console.error("Error fetching messages:", error);
-      toast.error(error.response.data.message);
+
+      // Handle 401 errors specifically
+      if (error.response?.status === 401) {
+        console.log("Unauthorized access - clearing auth state");
+        useAuthStore.getState().logout();
+        toast.error("Session expired. Please login again.");
+        return;
+      }
+
+      toast.error(error.response?.data?.message || "Failed to fetch messages");
     } finally {
       set({ isMessagesLoading: false });
     }
@@ -58,8 +76,9 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
 
     socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id
-      if(!isMessageSentFromSelectedUser) return;
+      const isMessageSentFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
+      if (!isMessageSentFromSelectedUser) return;
       set({
         messages: [...get().messages, newMessage],
       });
