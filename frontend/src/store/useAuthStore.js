@@ -3,7 +3,15 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = "http://localhost:5001";
+// Determine the base URL based on environment
+const getBaseURL = () => {
+  if (import.meta.env.MODE === "development") {
+    return "http://localhost:5001";
+  }
+  return "https://neurochat-ech0.onrender.com";
+};
+
+const BASE_URL = getBaseURL();
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
