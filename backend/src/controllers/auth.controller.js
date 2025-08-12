@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import  User  from "../models/user.model.js";
+import User from "../models/user.model.js";
 import { generateToken } from "../lib/utils.js";
 import imagekit from "../lib/imagekit.js";
 
@@ -10,7 +10,9 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
     }
     const user = await User.findOne({ email });
     if (user) {
@@ -68,6 +70,9 @@ export const logout = (req, res) => {
   try {
     res.cookie("jwt", "", {
       maxAge: 0,
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      secure: process.env.NODE_ENV === "production",
     });
     res.json({ message: "Logged out successfully" });
   } catch (error) {
