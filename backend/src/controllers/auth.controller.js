@@ -6,6 +6,7 @@ import imagekit from "../lib/imagekit.js";
 export const signup = async (req, res) => {
   const { email, fullName, password } = req.body;
   try {
+    console.log("Signup attempt for:", email);
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -29,6 +30,7 @@ export const signup = async (req, res) => {
     if (newUser) {
       const token = generateToken(newUser._id, res);
       await newUser.save();
+      console.log("User created successfully:", email);
       res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
@@ -47,6 +49,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
+    console.log("Login attempt for:", email);
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid Credentials" });
@@ -56,6 +59,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
     const token = generateToken(user._id, res);
+    console.log("Login successful for:", email);
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
@@ -73,7 +77,7 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", {
       maxAge: 0,
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
     });
     res.json({ message: "Logged out successfully" });

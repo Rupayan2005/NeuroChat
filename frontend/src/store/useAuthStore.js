@@ -3,15 +3,14 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-// const getBaseURL = () => {
-//   if (import.meta.env.MODE === "development") {
-//     return "http://localhost:5001";
-//   }
-//   return "https://neurochat-ech0.onrender.com";
-// };
+const getBaseURL = () => {
+  if (import.meta.env.MODE === "development") {
+    return "http://localhost:5001";
+  }
+  return "https://neurochat-ech0.onrender.com";
+};
 
-// const BASE_URL = getBaseURL();
-const BASE_URL = "https://neurochat-ech0.onrender.com";
+const BASE_URL = getBaseURL();
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -45,19 +44,23 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
+      console.log("Attempting signup...");
       const res = await axiosInstance.post("/auth/signup", data);
 
       // Store token in localStorage
       if (res.data.token) {
         localStorage.setItem("auth-token", res.data.token);
+        console.log("Token stored after signup");
       }
 
       set({ authUser: res.data });
       toast.success("Account created successfully");
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
       console.error("Signup error:", error);
+      const errorMessage =
+        error.response?.data?.message || "Signup failed. Please try again.";
+      toast.error(errorMessage);
     } finally {
       set({ isSigningUp: false });
     }
@@ -66,19 +69,23 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
+      console.log("Attempting login...");
       const res = await axiosInstance.post("/auth/login", data);
 
       // Store token in localStorage
       if (res.data.token) {
         localStorage.setItem("auth-token", res.data.token);
+        console.log("Token stored after login");
       }
 
       set({ authUser: res.data });
       toast.success("Logged in successfully");
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
       console.error("Login error:", error);
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
+      toast.error(errorMessage);
     } finally {
       set({ isLoggingIn: false });
     }
@@ -127,11 +134,24 @@ export const useAuthStore = create((set, get) => ({
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
+
+    console.log("Connecting to socket with user ID:", authUser._id);
     const socket = io(BASE_URL, {
       query: { userId: authUser._id },
+      transports: ["websocket", "polling"],
+      forceNew: true,
     });
+
     socket.connect();
     set({ socket: socket });
+
+    socket.on("connect", () => {
+      console.log("Socket connected successfully");
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
