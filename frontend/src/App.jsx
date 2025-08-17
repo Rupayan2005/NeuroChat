@@ -15,7 +15,12 @@ import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
-  const { theme } = useThemeStore();
+  const { theme, initializeTheme } = useThemeStore();
+
+  // Initialize theme on app load
+  useEffect(() => {
+    initializeTheme();
+  }, [initializeTheme]);
 
   // Ensure theme is applied to the entire page, not just the visible div
   useEffect(() => {

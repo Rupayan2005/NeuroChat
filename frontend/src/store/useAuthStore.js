@@ -98,10 +98,18 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logged out successfully");
       get().disconnectSocket();
 
+      // Preserve theme before clearing localStorage
+      const currentTheme = localStorage.getItem("chat-theme");
+
       // Clear token from localStorage
       localStorage.removeItem("auth-token");
       localStorage.clear();
       sessionStorage.clear();
+
+      // Restore theme after clearing
+      if (currentTheme) {
+        localStorage.setItem("chat-theme", currentTheme);
+      }
 
       // Redirect to welcome page instead of login page
       window.location.href = "/";
@@ -110,9 +118,19 @@ export const useAuthStore = create((set, get) => ({
       // Even if logout request fails, clear local state
       set({ authUser: null });
       get().disconnectSocket();
+
+      // Preserve theme before clearing localStorage
+      const currentTheme = localStorage.getItem("chat-theme");
+
       localStorage.removeItem("auth-token");
       localStorage.clear();
       sessionStorage.clear();
+
+      // Restore theme after clearing
+      if (currentTheme) {
+        localStorage.setItem("chat-theme", currentTheme);
+      }
+
       window.location.href = "/";
     }
   },

@@ -37,10 +37,18 @@ axiosInstance.interceptors.response.use(
     console.error("API Error:", error.response?.data || error.message);
 
     if (error.response?.status === 401) {
+      // Preserve theme before clearing localStorage
+      const currentTheme = localStorage.getItem("chat-theme");
+
       // Clear auth state on 401 errors
       localStorage.removeItem("auth-token");
       localStorage.clear();
       sessionStorage.clear();
+
+      // Restore theme after clearing
+      if (currentTheme) {
+        localStorage.setItem("chat-theme", currentTheme);
+      }
 
       // Redirect to welcome page instead of login page
       if (

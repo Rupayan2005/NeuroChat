@@ -16,28 +16,22 @@ export const protectRoute = async (req, res, next) => {
 
     if (!token) {
       console.log("No token found in cookies or headers");
-      console.log("Cookies:", req.cookies);
-      console.log("Authorization header:", req.headers.authorization);
       return res
         .status(401)
         .json({ message: "Unauthorized, no token provided" });
     }
 
-    console.log("Token found, verifying...");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) {
       console.log("Token verification failed");
       return res.status(401).json({ message: "Unauthorized, invalid token" });
     }
 
-    console.log("Token verified, finding user:", decoded.userId);
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
       console.log("User not found for token");
       return res.status(404).json({ message: "Unauthorized, user not found" });
     }
-
-    console.log("User authenticated successfully:", user.email);
     req.user = user;
     next();
   } catch (error) {
